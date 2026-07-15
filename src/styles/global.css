@@ -1,0 +1,101 @@
+/* ============================================================
+   认知障碍筛查系统 - 全局样式
+   ============================================================ */
+
+@import './theme.css';
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--text-regular);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- 页面标题 ---- */
+.page-hd {
+  font-size: var(--font-size-title);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ---- 卡片 ---- */
+.card-box {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  transition: box-shadow 0.2s;
+}
+.card-box:hover { box-shadow: var(--shadow-hover); }
+.card-hd {
+  display: flex; align-items: center; gap: 8px;
+  font-size: var(--font-size-md); font-weight: 600;
+  color: var(--text-primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+.card-bd { padding: var(--spacing-lg); }
+
+/* ---- 筛选栏 ---- */
+.filter-bar {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+}
+
+/* ---- 表格区 ---- */
+.table-card {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-color);
+}
+
+/* ---- Element Plus 覆盖 ---- */
+.el-card { border-radius: var(--border-radius) !important; border: 1px solid var(--border-color) !important; }
+.el-card__header { padding: var(--spacing-md) var(--spacing-lg) !important; border-bottom: 1px solid var(--border-color) !important; font-weight: 600; }
+.el-card__body { padding: var(--spacing-lg) !important; }
+.el-button--primary { background: var(--color-primary) !important; border-color: var(--color-primary) !important; }
+.el-button--primary:hover { background: var(--color-primary-light) !important; }
+.el-table th.el-table__cell { background: #f8fafc; color: var(--text-primary); font-weight: 600; font-size: var(--font-size-sm); }
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell { background: #fafbfd; }
+.el-pagination { justify-content: flex-end; padding-top: var(--spacing-md); }
+.el-tag { border-radius: var(--border-radius-sm) !important; }
+.el-dialog { border-radius: var(--border-radius-lg) !important; }
+.el-drawer__header { margin-bottom: var(--spacing-md) !important; font-weight: 600; }
+.el-descriptions__label { font-weight: 500; color: var(--text-secondary); }
+.el-breadcrumb { font-size: var(--font-size-sm); }
+
+/* ---- 滚动条 ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b0bac9; }
+
+/* ---- 工具类 ---- */
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.text-muted { color: var(--text-secondary); font-size: var(--font-size-sm); }
+.text-danger { color: var(--color-danger); }
+.text-warning { color: var(--color-warning); }
+.text-success { color: var(--color-success); }
+.text-primary { color: var(--text-primary); font-weight: 600; }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+
+/* ---- 空状态 ---- */
+.empty-state { padding: 48px 0; text-align: center; }
+.empty-state p { color: var(--text-placeholder); margin-top: 12px; }
