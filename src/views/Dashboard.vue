@@ -72,11 +72,38 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); pieCh?.d
 </script>
 
 <style scoped>
-.db { max-width: 1500px; }
-.db-cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 16px; }
+.db { max-width: 1500px; min-width: 0; }
+.db-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 16px; }
 .dbc { background: #fff; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #e4e8ee; transition: box-shadow 0.2s; }
 .dbc:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 .dbc-v { font-size: 30px; font-weight: 700; }
 .dbc-l { font-size: 13px; color: #7c8ca5; margin-top: 4px; }
 .db-chart { height: 350px; }
+
+@media (max-width: 768px) {
+  .db-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .dbc {
+    min-height: 92px;
+    padding: 14px;
+  }
+
+  .dbc-v {
+    font-size: 26px;
+    line-height: 1.1;
+  }
+
+  .dbc-l {
+    font-size: 13px;
+    line-height: 1.35;
+    word-break: keep-all;
+  }
+
+  .db-chart {
+    height: 280px;
+  }
+}
 </style>

@@ -99,3 +99,80 @@ html, body, #app {
 /* ---- 空状态 ---- */
 .empty-state { padding: 48px 0; text-align: center; }
 .empty-state p { color: var(--text-placeholder); margin-top: 12px; }
+
+/* ---- 移动端适配 ---- */
+@media (max-width: 768px) {
+  html, body, #app {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .page-hd {
+    font-size: 18px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+    word-break: keep-all;
+  }
+
+  .card-box {
+    margin-bottom: 12px;
+  }
+
+  .card-hd {
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .card-bd {
+    padding: 14px;
+  }
+
+  .filter-bar {
+    padding: 12px;
+  }
+
+  .el-row {
+    display: block !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .el-row > .el-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-bottom: 12px;
+  }
+
+  .el-card__header {
+    padding: 12px 14px !important;
+  }
+
+  .el-card__body {
+    padding: 14px !important;
+  }
+
+  .el-table {
+    font-size: 13px;
+  }
+
+  .el-table .cell {
+    padding: 0 8px;
+  }
+
+  .el-form-item {
+    margin-bottom: 14px;
+  }
+
+  .el-dialog {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .el-drawer {
+    max-width: 84vw;
+  }
+}
