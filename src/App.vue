@@ -125,7 +125,6 @@ const drawerVisible = ref(false)
 const active = computed(() => route.path)
 const doctorName = computed(() => authStore.doctor?.name || '张主任')
 const doctorDept = computed(() => authStore.doctor?.department || '神经内科')
-const doctorHospital = computed(() => authStore.doctor?.hospital || '认知障碍筛查中心')
 
 const menuItems = [
   { path: '/dashboard', label: '专业工作台', icon: DataBoard },
@@ -349,6 +348,12 @@ onUnmounted(() => clearInterval(timer))
   color: #ffffff !important;
   background: linear-gradient(135deg, #2f80c2, #42a5f5) !important;
   box-shadow: 0 12px 22px rgba(47, 128, 194, 0.24);
+}
+
+.side-nav :deep(.doctor-card),
+.side-nav :deep(.doctor-avatar),
+.side-nav :deep(.doctor-meta) {
+  display: none !important;
 }
 
 .aside-menu :deep(.el-menu-item.is-active::before) {
