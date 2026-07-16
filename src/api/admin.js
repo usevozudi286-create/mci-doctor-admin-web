@@ -467,14 +467,81 @@ function handleMockAction(action, params) {
       xinghuo: { weightedScore: 4.8, classification: 'mild_risk', latency: 1.8 },
       comparison: '两个模型在词汇和语义维度评估基本一致，DeepSeek在流畅度评估上更保守。'
     };
-    case 'exportResearchData': return {
-      preview: MOCK_REPORTS.slice(0, 5).map(r => ({
-        patientName: r.profile.name[0] + '*', age: r.profile.age, gender: r.profile.gender,
-        weightedScore: r.weightedScore, classification: r.classification, createdAt: r.createdAt
-      })),
-      total: MOCK_REPORTS.length,
-      availableFields: ['patientName','age','gender','education','dialect','weightedScore','classification','dimensions','observations','createdAt']
-    };
+    case 'exportResearchData': {
+      const riskLabels = {
+        normal: '正常',
+        attention: '需关注',
+        suspected_mci: '疑似 MCI',
+        mild_risk: '轻度 MCI 风险',
+        moderate_risk: '中度 MCI 风险',
+        high_risk: '高度 MCI 风险',
+        confirmed_impairment: '确认认知障碍'
+      };
+      const deidentify = params.deidentify !== false;
+      const startTime = params.startDate ? new Date(`${params.startDate}T00:00:00`).getTime() : null;
+      const endTime = params.endDate ? new Date(`${params.endDate}T23:59:59`).getTime() : null;
+      const maskName = name => deidentify ? `${String(name || '样本').slice(0, 1)}**` : name;
+      const ageRange = age => {
+        const n = Number(age) || 0;
+        if (!deidentify) return String(age || '');
+        if (n < 60) return '60岁以下';
+        if (n < 70) return '60-69';
+        if (n < 80) return '70-79';
+        return '80岁及以上';
+      };
+
+      let list = [...MOCK_REPORTS];
+      if (params.riskLevel) list = list.filter(r => r.classification === params.riskLevel);
+      if (startTime) list = list.filter(r => new Date(r.createdAt).getTime() >= startTime);
+      if (endTime) list = list.filter(r => new Date(r.createdAt).getTime() <= endTime);
+
+      const records = list.map((r, index) => ({
+        sampleId: `MCI-${String(index + 1).padStart(4, '0')}`,
+        patientName: maskName(r.profile?.name),
+        age: deidentify ? undefined : r.profile?.age,
+        ageRange: ageRange(r.profile?.age),
+        gender: r.profile?.gender || '',
+        education: r.profile?.education || '',
+        dialect: r.profile?.dialect || '',
+        weightedScore: r.weightedScore,
+        classification: r.classification,
+        classificationLabel: riskLabels[r.classification] || r.classification,
+        vocabularyScore: r.dimensions?.vocabulary?.compositeScore ?? '',
+        syntaxScore: r.dimensions?.syntax?.compositeScore ?? '',
+        semanticScore: r.dimensions?.semantic?.compositeScore ?? '',
+        fluencyScore: r.dimensions?.fluency?.compositeScore ?? '',
+        logicScore: r.dimensions?.logic?.compositeScore ?? '',
+        pauseCount: 6 + (index % 9),
+        repeatCount: 2 + (index % 5),
+        hesitationCount: 3 + (index % 7),
+        transcript: deidentify
+          ? '患者描述日常生活、记忆变化和社交情况，已移除姓名、手机号、住址等可识别信息。'
+          : '患者原始转写文本示例：最近记性下降，经常找不到钥匙和手机。',
+        clinicalDiagnosis: ['待标注', '正常老化', '疑似 MCI', '建议线下量表评估'][index % 4],
+        mmseScore: 22 + (index % 8),
+        mocaScore: 18 + (index % 9),
+        createdAt: new Date(r.createdAt).toLocaleString('zh-CN')
+      })).map(row => {
+        if (deidentify) {
+          const { age, ...safeRow } = row;
+          return safeRow;
+        }
+        return row;
+      });
+
+      const fields = deidentify
+        ? ['sampleId', 'patientName', 'ageRange', 'gender', 'education', 'dialect', 'weightedScore', 'classificationLabel', 'vocabularyScore', 'syntaxScore', 'semanticScore', 'fluencyScore', 'logicScore', 'pauseCount', 'repeatCount', 'hesitationCount', 'transcript', 'clinicalDiagnosis', 'mmseScore', 'mocaScore', 'createdAt']
+        : ['sampleId', 'patientName', 'age', 'ageRange', 'gender', 'education', 'dialect', 'weightedScore', 'classificationLabel', 'vocabularyScore', 'syntaxScore', 'semanticScore', 'fluencyScore', 'logicScore', 'pauseCount', 'repeatCount', 'hesitationCount', 'transcript', 'clinicalDiagnosis', 'mmseScore', 'mocaScore', 'createdAt'];
+
+      return {
+        records,
+        preview: records,
+        total: records.length,
+        fields,
+        availableFields: fields,
+        privacyCheck: deidentify ? '通过：无姓名全称、手机号、OpenID、语音地址残留' : '未开启脱敏'
+      };
+    }
     case 'getDoctorMessages': return {
       messages: [
         { id: 'm1', type: 'alert', title: '筛查异常提醒', content: '患者张秀英最近一次筛查显示高度MCI风险，建议尽快安排门诊评估。', patientName: '张秀英', createdAt: new Date(Date.now()-86400000).toISOString(), read: false },
