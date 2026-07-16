@@ -50,6 +50,7 @@ async function callAdmin(action, params = {}) {
 
 // ========== 公开 API ==========
 export async function doctorLogin(u, p) { return callAdmin('doctorLogin', { username: u, password: p }); }
+export async function doctorRegister(data) { return callAdmin('doctorRegister', data); }
 export async function getDashboardStats() { return callAdmin('getDashboardStats'); }
 export async function getPatientList(opts = {}) { return callAdmin('getPatientList', { keyword: opts.keyword || '', skip: (opts.page - 1) * (opts.pageSize || 20), limit: opts.pageSize || 20 }); }
 export async function getPatientDetail(uid) { return callAdmin('getPatientDetail', { userId: uid }); }
@@ -212,6 +213,34 @@ function makeReport(user, i, cls, dims, wScore, daysAgo, fuStatus) {
 
 const MOCK_REPORTS = buildMockReports();
 const HIGH_RISK_CLASSES = ['high_risk', 'suspected_mci', 'attention', 'confirmed_impairment'];
+const DOCTOR_ACCOUNTS_KEY = 'mci_doctor_accounts';
+
+function getDoctorAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem(DOCTOR_ACCOUNTS_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveDoctorAccounts(accounts) {
+  localStorage.setItem(DOCTOR_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function createDoctorToken(username) {
+  return 'doctor_token_' + username + '_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+}
+
+function toDoctorInfo(account) {
+  return {
+    id: account.id,
+    username: account.username,
+    name: account.name,
+    department: account.department,
+    hospital: account.hospital,
+    role: account.role || 'doctor'
+  };
+}
 
 // ========== Mock Action 分发 ==========
 function handleMockAction(action, params) {
@@ -223,7 +252,59 @@ function handleMockAction(action, params) {
           doctorInfo: { id: 'admin_001', name: '张主任', department: '神经内科', hospital: '认知障碍筛查中心', role: 'admin' }
         };
       }
+
+      const account = getDoctorAccounts().find(item => item.username === params.username);
+      if (account && account.password === params.password) {
+        return {
+          token: createDoctorToken(account.username),
+          doctorInfo: toDoctorInfo(account)
+        };
+      }
       throw new Error('账号或密码错误');
+    }
+
+    case 'doctorRegister': {
+      const username = String(params.username || '').trim();
+      const password = String(params.password || '');
+      const name = String(params.name || '').trim();
+      const department = String(params.department || '').trim();
+      const hospital = String(params.hospital || '').trim();
+
+      if (!username || !password || !name || !department || !hospital) {
+        throw new Error('请完整填写注册信息');
+      }
+      if (username.length < 3) {
+        throw new Error('账号至少 3 个字符');
+      }
+      if (password.length < 6) {
+        throw new Error('密码至少 6 位');
+      }
+      if (username === 'admin') {
+        throw new Error('该账号已存在');
+      }
+
+      const accounts = getDoctorAccounts();
+      if (accounts.some(item => item.username === username)) {
+        throw new Error('该账号已存在');
+      }
+
+      const account = {
+        id: 'doctor_' + Date.now(),
+        username,
+        password,
+        name,
+        department,
+        hospital,
+        role: 'doctor',
+        createdAt: new Date().toISOString()
+      };
+      accounts.push(account);
+      saveDoctorAccounts(accounts);
+
+      return {
+        token: createDoctorToken(username),
+        doctorInfo: toDoctorInfo(account)
+      };
     }
 
     case 'getDashboardStats': {
@@ -506,4 +587,4 @@ export async function getComplianceStats() { return callAdmin('getComplianceStat
 export async function getModelPerformanceStats() { return callAdmin('getModelPerformanceStats'); }
 export async function getResearchSummary() { return callAdmin('getResearchSummary'); }
 
-export default { doctorLogin, getDashboardStats, getPatientList, getPatientDetail, getReportList, getReportDetail, updateFollowUp, getHighRiskReports, getFollowUpList, getClinicalAssessment, saveClinicalAssessment, getInterventionPlan, saveInterventionPlan, pushInterventionPlan, getModelConfig, saveModelConfig, compareModelOutput, exportResearchData, getDoctorMessages, replyDoctorMessage, getInstitutionStats, advancedSearchPatients, getFullReportDetail, saveCorrectedTranscript, reanalyzeReport, getPatientTrend, compareReports, saveClinicalScaleScores, generateClinicalAdvice, generateReferralNote, scheduleFollowUp, getInterventionTemplates, getInterventionCompliance, getPromptConfig, savePromptConfig, previewPrompt, getModelProviders, getConfigVersions, rollbackConfigVersion, runABTest, searchResearchSamples, previewDeidentifiedData, saveResearchDataset, labelResearchSample, getResearchDatasets, getAlertNotifications, updateAlertStatus, saveFollowUpRecord, getComplianceStats, getModelPerformanceStats, getResearchSummary };
+export default { doctorLogin, doctorRegister, getDashboardStats, getPatientList, getPatientDetail, getReportList, getReportDetail, updateFollowUp, getHighRiskReports, getFollowUpList, getClinicalAssessment, saveClinicalAssessment, getInterventionPlan, saveInterventionPlan, pushInterventionPlan, getModelConfig, saveModelConfig, compareModelOutput, exportResearchData, getDoctorMessages, replyDoctorMessage, getInstitutionStats, advancedSearchPatients, getFullReportDetail, saveCorrectedTranscript, reanalyzeReport, getPatientTrend, compareReports, saveClinicalScaleScores, generateClinicalAdvice, generateReferralNote, scheduleFollowUp, getInterventionTemplates, getInterventionCompliance, getPromptConfig, savePromptConfig, previewPrompt, getModelProviders, getConfigVersions, rollbackConfigVersion, runABTest, searchResearchSamples, previewDeidentifiedData, saveResearchDataset, labelResearchSample, getResearchDatasets, getAlertNotifications, updateAlertStatus, saveFollowUpRecord, getComplianceStats, getModelPerformanceStats, getResearchSummary };
