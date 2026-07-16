@@ -178,14 +178,6 @@ const SideNav = defineComponent({
         h(ElIcon, { class: 'menu-icon' }, () => h(item.icon)),
         h('span', { class: 'menu-label' }, item.label)
       ]))),
-      h('div', { class: 'doctor-card' }, [
-        h('div', { class: 'doctor-avatar' }, doctorName.value.slice(0, 1)),
-        h('div', { class: 'doctor-meta' }, [
-          h('strong', { title: doctorName.value }, doctorName.value),
-          h('span', { title: doctorDept.value }, doctorDept.value),
-          h('small', { title: doctorHospital.value }, doctorHospital.value)
-        ])
-      ])
     ])
   }
 })
@@ -374,60 +366,6 @@ onUnmounted(() => clearInterval(timer))
 }
 
 .menu-label {
-  white-space: nowrap;
-}
-
-.doctor-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 14px;
-  padding: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.58);
-}
-
-.doctor-avatar {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 36px;
-  margin-top: 1px;
-  border-radius: 10px;
-  color: #dff7ff;
-  background: rgba(47, 128, 194, 0.24);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1;
-}
-
-.doctor-meta {
-  min-width: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.doctor-meta strong {
-  display: block;
-  overflow: hidden;
-  color: #f8fafc;
-  font-size: 14px;
-  line-height: 20px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.doctor-meta span,
-.doctor-meta small {
-  display: block;
-  overflow: hidden;
-  color: #94a3b8;
-  font-size: 12px;
-  line-height: 18px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
