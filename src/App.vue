@@ -3,7 +3,7 @@
     <router-view v-if="$route.path === '/login'" />
 
     <el-container v-else class="admin-root">
-      <el-aside width="220px" class="aside desktop-aside">
+      <el-aside width="236px" class="aside desktop-aside">
         <SideNav />
       </el-aside>
 
@@ -25,16 +25,22 @@
             <el-divider class="desktop-divider" direction="vertical" />
             <el-dropdown trigger="click" @command="userCmd">
               <span class="top-user">
-                <el-avatar :size="30" icon="UserFilled" />
+                <el-avatar :size="30" :icon="UserFilled" />
                 <span class="tu-name">{{ doctorName }}</span>
                 <span class="tu-dept">{{ doctorDept }}</span>
                 <el-icon><ArrowDown /></el-icon>
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="info"><el-icon><User /></el-icon>个人信息</el-dropdown-item>
-                  <el-dropdown-item command="pwd"><el-icon><Lock /></el-icon>修改密码</el-dropdown-item>
-                  <el-dropdown-item command="logout" divided><el-icon><SwitchButton /></el-icon>退出登录</el-dropdown-item>
+                  <el-dropdown-item command="info">
+                    <el-icon><User /></el-icon>个人信息
+                  </el-dropdown-item>
+                  <el-dropdown-item command="pwd">
+                    <el-icon><Lock /></el-icon>修改密码
+                  </el-dropdown-item>
+                  <el-dropdown-item command="logout" divided>
+                    <el-icon><SwitchButton /></el-icon>退出登录
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -47,7 +53,13 @@
       </el-container>
     </el-container>
 
-    <el-drawer v-model="drawerVisible" direction="ltr" size="280px" :with-header="false" class="mobile-drawer">
+    <el-drawer
+      v-model="drawerVisible"
+      direction="ltr"
+      size="288px"
+      :with-header="false"
+      class="mobile-drawer"
+    >
       <SideNav @navigate="drawerVisible = false" />
     </el-drawer>
 
@@ -56,15 +68,23 @@
         <el-descriptions-item label="姓名">{{ authStore.doctor?.name || '-' }}</el-descriptions-item>
         <el-descriptions-item label="科室">{{ authStore.doctor?.department || '-' }}</el-descriptions-item>
         <el-descriptions-item label="机构">{{ authStore.doctor?.hospital || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="角色">{{ authStore.doctor?.role === 'admin' ? '主任医师' : '医生' }}</el-descriptions-item>
+        <el-descriptions-item label="角色">
+          {{ authStore.doctor?.role === 'admin' ? '主任医师' : '医生' }}
+        </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
 
     <el-dialog v-model="pwdShow" title="修改密码" width="380px">
       <el-form :model="pwd" label-width="80px">
-        <el-form-item label="原密码"><el-input v-model="pwd.old" type="password" show-password /></el-form-item>
-        <el-form-item label="新密码"><el-input v-model="pwd.nw" type="password" show-password placeholder="至少6位" /></el-form-item>
-        <el-form-item label="确认密码"><el-input v-model="pwd.cf" type="password" show-password /></el-form-item>
+        <el-form-item label="原密码">
+          <el-input v-model="pwd.old" type="password" show-password />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="pwd.nw" type="password" show-password placeholder="至少 6 位" />
+        </el-form-item>
+        <el-form-item label="确认密码">
+          <el-input v-model="pwd.cf" type="password" show-password />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="pwdShow = false">取消</el-button>
@@ -84,13 +104,15 @@ import {
   Document,
   Download,
   EditPen,
+  FirstAidKit,
   Lock,
   Menu,
   Opportunity,
   Setting,
   SwitchButton,
   TrendCharts,
-  User
+  User,
+  UserFilled
 } from '@element-plus/icons-vue'
 import { ElIcon, ElMenu, ElMenuItem, ElMessage } from 'element-plus'
 import { useAuthStore } from './stores/auth'
@@ -103,6 +125,7 @@ const drawerVisible = ref(false)
 const active = computed(() => route.path)
 const doctorName = computed(() => authStore.doctor?.name || '张主任')
 const doctorDept = computed(() => authStore.doctor?.department || '神经内科')
+const doctorHospital = computed(() => authStore.doctor?.hospital || '认知障碍筛查中心')
 
 const menuItems = [
   { path: '/dashboard', label: '专业工作台', icon: DataBoard },
@@ -126,28 +149,43 @@ const SideNav = defineComponent({
   emits: ['navigate'],
   setup(_, { emit }) {
     return () => h('div', { class: 'side-nav' }, [
-      h('div', {
+      h('button', {
         class: 'aside-logo',
+        type: 'button',
         onClick: () => {
           router.push('/dashboard')
           emit('navigate')
         }
       }, [
-        h('span', { class: 'alo-icon' }, '🧠'),
-        h('div', null, [
-          h('div', { class: 'alo-t' }, '认知筛查'),
-          h('div', { class: 'alo-s' }, '医生专业端')
+        h('span', { class: 'alo-icon' }, [
+          h(ElIcon, null, () => h(FirstAidKit))
+        ]),
+        h('span', { class: 'alo-text' }, [
+          h('strong', { class: 'alo-t' }, '认知筛查'),
+          h('span', { class: 'alo-s' }, '医生专业端')
         ])
       ]),
+      h('div', { class: 'nav-section-title' }, '专业功能'),
       h(ElMenu, {
         defaultActive: active.value,
         router: true,
         class: 'aside-menu',
+        backgroundColor: 'transparent',
+        textColor: '#cbd5e1',
+        activeTextColor: '#ffffff',
         onSelect: () => emit('navigate')
       }, () => menuItems.map(item => h(ElMenuItem, { index: item.path }, () => [
-        h(ElIcon, null, () => h(item.icon)),
-        h('span', null, item.label)
-      ])))
+        h(ElIcon, { class: 'menu-icon' }, () => h(item.icon)),
+        h('span', { class: 'menu-label' }, item.label)
+      ]))),
+      h('div', { class: 'doctor-card' }, [
+        h('div', { class: 'doctor-avatar' }, doctorName.value.slice(0, 1)),
+        h('div', { class: 'doctor-meta' }, [
+          h('strong', null, doctorName.value),
+          h('span', null, doctorDept.value),
+          h('small', null, doctorHospital.value)
+        ])
+      ])
     ])
   }
 })
@@ -190,7 +228,7 @@ function changePwd() {
     return
   }
   if (pwd.nw.length < 6) {
-    ElMessage.warning('新密码至少6位')
+    ElMessage.warning('新密码至少 6 位')
     return
   }
   if (pwd.nw !== pwd.cf) {
@@ -225,61 +263,167 @@ onUnmounted(() => clearInterval(timer))
 }
 
 .aside {
-  background: #1a2332;
+  background: #111827;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 10px 0 32px rgba(15, 23, 42, 0.08);
 }
 
 .side-nav {
   height: 100%;
-  background: #1a2332;
+  padding: 16px 12px;
+  background:
+    linear-gradient(180deg, rgba(47, 128, 194, 0.16), rgba(17, 24, 39, 0) 230px),
+    #111827;
   display: flex;
   flex-direction: column;
 }
 
 .aside-logo {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 18px 20px;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 18px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: left;
 }
 
 .alo-icon {
-  font-size: 26px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  color: #ffffff;
+  font-size: 22px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #2f80c2, #35b8a6);
+  box-shadow: 0 12px 24px rgba(47, 128, 194, 0.28);
+}
+
+.alo-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .alo-t {
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.3;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: 0;
 }
 
 .alo-s {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 11px;
+  margin-top: 3px;
+  color: #9fb0c7;
+  font-size: 12px;
+}
+
+.nav-section-title {
+  padding: 0 12px 8px;
+  color: #718096;
+  font-size: 12px;
 }
 
 .aside-menu {
   border: none !important;
   flex: 1;
-  padding: 8px;
   overflow-y: auto;
 }
 
 .aside-menu :deep(.el-menu-item) {
-  height: 42px;
-  line-height: 42px;
-  margin: 2px 0;
-  border-radius: 8px;
+  height: 46px;
+  line-height: 46px;
+  margin: 4px 0;
+  padding: 0 13px !important;
+  border-radius: 10px;
   font-size: 14px;
+  letter-spacing: 0;
+}
+
+.aside-menu :deep(.el-menu-item:hover) {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.aside-menu :deep(.el-menu-item.is-active) {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #2f80c2, #42a5f5) !important;
+  box-shadow: 0 12px 22px rgba(47, 128, 194, 0.24);
+}
+
+.aside-menu :deep(.el-menu-item.is-active::before) {
+  content: "";
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: #ffffff;
+  margin-right: 9px;
+}
+
+.menu-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.menu-label {
+  white-space: nowrap;
+}
+
+.doctor-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.58);
+}
+
+.doctor-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  border-radius: 10px;
+  color: #dff7ff;
+  background: rgba(47, 128, 194, 0.24);
+  font-weight: 700;
+}
+
+.doctor-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-meta strong {
+  color: #f8fafc;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.doctor-meta span,
+.doctor-meta small {
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar {
-  background: #fff;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -388,7 +532,7 @@ onUnmounted(() => clearInterval(timer))
 
   :global(.mobile-drawer .el-drawer__body) {
     padding: 0;
-    background: #1a2332;
+    background: #111827;
   }
 }
 </style>
